@@ -1,2 +1,2 @@
 # smelt
-SiMulation of ELectron detection Timing (SMELT) to study coincidence behavior for calibration sources 
+_smelt_ (**S**i**M**ulation of **EL**ectron detection **T**iming) is a Julia package to study measurement results with calibration sources in terms of timing and coincidence behavior
