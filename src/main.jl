@@ -18,6 +18,6 @@ srcs = Dict(
 
 res = run_sim(srcs; n_det=2, meas_time=10.)
 plot_e_hist(res, gain)
-
-println(dead_time_corr(length(res)))
-println(bi_rate * (1. + 4. + 1.2))
+plot_e_acc_hist(res, gain)
+plot_e_both_trig(res, gain)
+plot2D_e_both_trig(res, gain)
