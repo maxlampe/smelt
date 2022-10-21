@@ -89,7 +89,7 @@ function run_sim(
                 end
             end
 
-            # detect energy - i is main
+            # detect energy on each detector
             for j = 1:n_det
                 if det_main.is_measuring == true
                     if e_split[j] >= 0.1
