@@ -7,12 +7,12 @@ include("tools.jl")
 
 
 # ToDo: currently only works for dtime * SIM_STEP << 1
-function create_energy(src_dict::Dict, dtime::Float64)::Float64
+function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Float64
     energy = 0.
-    for src in src_dict
+    for src in srcs
         # rate always halved due to one detector only covering one hemisphere
-        if (src[2].rate * dtime) * 0.5 >= rand()
-            energy += randn() * src[2].width + src[2].energy
+        if (src[1] * dtime) * 0.5 >= rand()
+            energy += randn() * src[3] + src[2]
         end
     end
     return energy
@@ -20,7 +20,7 @@ end
 
 
 function run_sim(
-    src_dict::Dict;
+    srcs::Vector{Source};
     meas_time::Float64 = 1e0,
     sim_step::Float64 = 5e-9,
     n_det::Int64 = 1,
@@ -33,8 +33,14 @@ function run_sim(
 
     # calculate theoretical, pure rate from source
     theo_rate = 0.
-    for src in src_dict
-        theo_rate += src[2].rate
+    for src in srcs
+        theo_rate += src.rate
+    end
+
+    #convert to vector for faster evaluation
+    src_vec = Vector{Vector{Float64}}(undef, length(srcs))
+    for (i, src) in enumerate(srcs)
+        src_vec[i] = [src.rate, src.energy, src.width]
     end
 
     n_time_steps = meas_time/sim_step
@@ -71,7 +77,7 @@ function run_sim(
         # Independent event for each detector.
         for i = 1:n_det
             # create energy from all sources at this time step
-            e_now = create_energy(src_dict, sim_step)
+            e_now = create_energy(src_vec, sim_step)
 
             e_split = [0.0, 0.0]
             e_split[i] = e_now

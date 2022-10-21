@@ -21,7 +21,7 @@ include("tools.jl")
         # Check that second detector buffer is kept empty during single detector runs even with bs
         meas_time = 0.1
         src_rate = 5e4
-        mono_src = Dict("mono" => Source(src_rate, 400., 0.))
+        mono_src = [Source("mono", src_rate, 400., 0.)]
 
         res, stat = run_sim(mono_src; n_det=1, meas_time=meas_time, with_bs=true)
         inv_count = 0
@@ -38,7 +38,7 @@ include("tools.jl")
         # Check if theo and sim rate are equal for low activity, no bs, tiny integration window
         meas_time = 0.5
         src_rate = 5e2
-        mono_src = Dict("mono" => Source(src_rate, 400., 0.))
+        mono_src = [Source("mono", src_rate, 400., 0.)]
 
         for i = 1:2
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
@@ -53,7 +53,7 @@ include("tools.jl")
         # Check if theo and dead time corrected sim rate are equal for high activity, no bs, tiny integration window
         meas_time = 0.5
         src_rate = 5e4
-        mono_src = Dict("mono" => Source(src_rate, 400., 0.))
+        mono_src = [Source("mono", src_rate, 400., 0.)]
         for i = 1:2
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
             # half rate for one detector due to it only covering one hemisphere
@@ -67,7 +67,7 @@ include("tools.jl")
         # Check if theo and meas accidental rate agree for high activity, no bs
         meas_time = 0.5
         src_rate = 5e4
-        mono_src = Dict("mono" => Source(src_rate, 400., 0.))
+        mono_src = [Source("mono", src_rate, 400., 0.)]
         # use default, checked in first test if Perkeo value
         dummy = Detector()
         meas_wnd = dummy.t_meas
@@ -93,7 +93,7 @@ include("tools.jl")
         meas_time = 0.3
         src_rate = 5e3
         src_energy = 1000.
-        mono_src = Dict("mono" => Source(src_rate, src_energy, 0.))
+        mono_src = [Source("mono", src_rate, src_energy, 0.)]
         res, stat = run_sim(mono_src; n_det=1, meas_time=meas_time, with_bs=true)
 
         es_mn = []
@@ -123,7 +123,7 @@ include("tools.jl")
         meas_time = 0.3
         src_rate = 5e3
         src_energy = 1000.
-        mono_src = Dict("mono" => Source(src_rate, src_energy, 0.))
+        mono_src = [Source("mono", src_rate, src_energy, 0.)]
         res, stat = run_sim(mono_src; n_det=2, meas_time=meas_time, with_bs=true)
 
         es_mn = []
