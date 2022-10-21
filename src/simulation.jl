@@ -9,7 +9,8 @@ include("tools.jl")
 function create_energy(src_dict::Dict, dtime::Float64)::Float64
     energy = 0.
     for src in src_dict
-        if src[2].rate * dtime >= rand()
+        # rate always halved due to one detector only covering one hemisphere
+        if (src[2].rate * dtime) * 0.5 >= rand()
             energy += randn() * src[2].width + src[2].energy
         end
     end
@@ -24,7 +25,9 @@ function run_sim(
     n_det::Int64 = 1,
     with_bs::Bool = false,
     t_meas::Float64 = 2e-7,
-)
+    verbose::Bool = false,
+)::Tuple{Vector{Event}, Dict}
+
     det_main = Detector(t_meas=t_meas)
 
     # calculate theoretical, pure rate from source
@@ -35,14 +38,21 @@ function run_sim(
 
     n_time_steps = meas_time/sim_step
     # Should be large enough buffer
-    data = Vector{Event}(undef, convert(Int, theo_rate * meas_time * n_det * 2.0)) # n_time_steps * 0.01
+    data = Vector{Event}(undef, floor(Int, theo_rate * meas_time * n_det * 2.0)) # n_time_steps * 0.01
     data_ind = 1
     curr_ev = Event()
     t_last_ev = 0.
 
+    if verbose
+        print("Smelting with n_det=$(n_det)... - ")
+    end
+
+    # main loop
     for t = 1:(n_time_steps)
-        if t % (0.1 * n_time_steps) == 0
-            println("At ", 100. * t/n_time_steps, "%")
+        if verbose
+            if t % (0.25 * n_time_steps) == 0
+                print(100. * t/n_time_steps, "% - ")
+            end
         end
 
         t_now = t * sim_step
@@ -65,15 +75,17 @@ function run_sim(
             e_split = [0.0, 0.0]
             e_split[i] = e_now
             t_tof_now = 0.0
-
+            
             # do backscattering process
             if e_now > 0.1 && with_bs
                 p = prob_bs(e_now)
                 if p >= rand()
                     frac_bs = e_bs_frac(e_now)
                     e_split[i] = e_now * frac_bs
-                    e_split[(i % 2) + 1] = e_now * (1.0 - frac_bs)
-                    t_tof_now = t_tof(e_now)   
+                    if n_det > 1
+                        e_split[(i % 2) + 1] = e_now * (1.0 - frac_bs)
+                    end
+                    t_tof_now = t_tof(e_now)
                 end
             end
 
@@ -94,14 +106,18 @@ function run_sim(
                         # Todo: This adds trigger bias towards first detector. Should not be a problem as dt = 1e-8
                         timing = [-1., -1.]
                         timing[i] = t_now
-                        if t_tof_now > 0.0
+                        if t_tof_now > 0.0 && n_det > 1
                             timing[(i % 2) + 1] = t_now + t_tof_now
                         end
 
-                        # e_ind = 
-                        # e_ind[j] = e_split[j]
+                        # if only one detector, we loose backscattered fraction
+                        if n_det == 1
+                            e_det = e_split[i]
+                        else
+                            e_det = e_now
+                        end
 
-                        curr_ev = Event(timing, e_now, e_split, 0, 0)
+                        curr_ev = Event(timing, e_det, e_split, 0, 0)
                         det_main.is_measuring = true
                     end
                 end
@@ -116,7 +132,6 @@ function run_sim(
                 int_last_ev = min(curr_ev.t_trig...)
             end
             
-
             if  (t_now - int_last_ev) >= det_main.t_meas
                 det_main.is_ready = false
                 det_main.is_measuring = false
@@ -131,11 +146,19 @@ function run_sim(
     end
 
     data = data[1:data_ind - 1]
+    stats = Dict(
+        "ev_count" => length(data),
+        "ev_dt_corr" => dead_time_corr(length(data), t_meas=meas_time),
+        "rate_obs_trig" => length(data) / meas_time,
+        "rate_theo_pure" => theo_rate,
+        "rate_dt_corr" => dead_time_corr(length(data), t_meas=meas_time) / meas_time,
+    )
+    if verbose
+        println()
+        for stat in stats
+            @printf "%s\t%.0f \n" stat[1] stat[2]
+        end    
+    end
 
-    @printf "Obs. trigger rate %.0f \n" length(data) / (n_det * meas_time)
-    println("Event counts ", length(data))
-    @printf "DT corr. rate  %.0f \n" dead_time_corr(length(data)) / (n_det * meas_time)
-    @printf "Theor. pure rate of srcs %.0f \n" theo_rate
-
-    return data
+    return data, stats
 end
