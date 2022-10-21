@@ -36,7 +36,7 @@ include("tools.jl")
     @info "Pure rate"
     @testset "Pure rate" begin
         # Check if theo and sim rate are equal for low activity, no bs, tiny integration window
-        meas_time = 2.0
+        meas_time = 0.5
         src_rate = 5e2
         mono_src = Dict("mono" => Source(src_rate, 400., 0.))
 
@@ -51,7 +51,7 @@ include("tools.jl")
     @info "Dead time"
     @testset "Dead time" begin
         # Check if theo and dead time corrected sim rate are equal for high activity, no bs, tiny integration window
-        meas_time = 2.0
+        meas_time = 0.5
         src_rate = 5e4
         mono_src = Dict("mono" => Source(src_rate, 400., 0.))
         for i = 1:2
@@ -65,7 +65,7 @@ include("tools.jl")
     @info "Accidental rate"
     @testset "Accidental rate" begin
         # Check if theo and meas accidental rate agree for high activity, no bs
-        meas_time = 2.0
+        meas_time = 0.5
         src_rate = 5e4
         mono_src = Dict("mono" => Source(src_rate, 400., 0.))
         # use default, checked in first test if Perkeo value
@@ -90,7 +90,7 @@ include("tools.jl")
     @testset "Backscattering, single detector" begin
         # Check if single detector with bs gets two peaks if they match the empirical fraction in energy and height
 
-        meas_time = 1.0
+        meas_time = 0.3
         src_rate = 5e3
         src_energy = 1000.
         mono_src = Dict("mono" => Source(src_rate, src_energy, 0.))
@@ -120,7 +120,7 @@ include("tools.jl")
     @testset "Backscattering, double detector" begin
         # Check if one of the two detectors with bs gets two peaks if they match the empirical fraction in energy and height
 
-        meas_time = 1.0
+        meas_time = 0.3
         src_rate = 5e3
         src_energy = 1000.
         mono_src = Dict("mono" => Source(src_rate, src_energy, 0.))
