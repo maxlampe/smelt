@@ -65,7 +65,7 @@ function plot2D_e_both_trig(data, gain::Float64 = 1.0)
         end
     end
     
-    histogram2d(dt, es, nbins=40, title="DeltaTriggerTime vs DetSum")
+    histogram2d(dt, es, nbins=40, title="DeltaTriggerTime vs DetSum", c=:imola)
     xlabel!("TrigTime0 - TrigTime1 [10 ns]")
     ylabel!("Energy [$(gain) keV]")
 end
