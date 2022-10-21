@@ -1,6 +1,7 @@
 
 
 using Printf
+using ProgressBars
 include("structs.jl")
 include("tools.jl")
 
@@ -48,7 +49,7 @@ function run_sim(
     end
 
     # main loop
-    for t = 1:(n_time_steps)
+    for t in ProgressBar(1:n_time_steps)
         if verbose
             if t % (0.25 * n_time_steps) == 0
                 print(100. * t/n_time_steps, "% - ")
