@@ -25,11 +25,15 @@ function run_sim(
     sim_step::Float64 = 5e-9,
     n_det::Int64 = 1,
     with_bs::Bool = false,
-    t_meas::Float64 = 2e-7,
+    t_meas::Union{Float64, Nothing} = nothing,
     verbose::Bool = false,
 )::Tuple{Vector{Event}, Dict}
 
+    if !isnothing(t_meas)
     det_main = Detector(t_meas=t_meas)
+    else
+        det_main = Detector()
+    end
 
     # calculate theoretical, pure rate from source
     theo_rate = 0.
@@ -55,7 +59,12 @@ function run_sim(
     end
 
     # main loop
-    for t in ProgressBar(1:n_time_steps)
+    if verbose
+        iter = ProgressBar(1:n_time_steps)
+    else
+        iter = (1:n_time_steps)
+    end
+    for t in iter
         if verbose
             if t % (0.25 * n_time_steps) == 0
                 print(100. * t/n_time_steps, "% - ")
