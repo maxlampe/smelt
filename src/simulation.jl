@@ -128,7 +128,6 @@ function run_sim(
                         if curr_ev.t_trig[j] < 0
                             curr_ev.t_trig[j] = t_now + abs(i - j) * t_tof_now
                         end
-                        curr_ev.e_det += e_split[j]
                         curr_ev.n_sum += 1
                         curr_ev.e_ind[j] += e_split[j]
                     end
@@ -143,13 +142,13 @@ function run_sim(
                         end
 
                         # if only one detector, we loose backscattered fraction
-                        if n_det == 1
-                            e_det = e_split[i]
-                        else
-                            e_det = e_split[j]
-                        end
+                        # if n_det == 1
+                        #     e_det = e_split[i]
+                        # else
+                        #     e_det = e_split[j]
+                        # end
 
-                        curr_ev = Event(timing, e_det, e_split, 0, 0)
+                        curr_ev = Event(timing, e_split, 0, 0)
                         det_main.is_measuring = true
                     end
                 end

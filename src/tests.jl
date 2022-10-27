@@ -99,11 +99,12 @@ include("tools.jl")
         es_mn = []
         es_bs= []
         for e in res
-            if e.e_det > 0.
-                if e.e_det > 700.
-                    push!(es_mn, e.e_det)
+            e_sum = e.e_ind[1] + e.e_ind[2]
+            if e_sum > 0.
+                if e_sum > 700.
+                    push!(es_mn, e_sum)
                 else
-                    push!(es_bs, e.e_det)
+                    push!(es_bs, e_sum)
                 end
             end
         end

@@ -12,7 +12,6 @@ end
 
 @with_kw mutable struct Event
     t_trig::Vector{Float64} = [-1., -1.]
-    e_det::Float64 = -1.
     e_ind::Vector{Float64} = [-1., -1]
     det::Int64 = -1
     n_sum::Int64 = 0
