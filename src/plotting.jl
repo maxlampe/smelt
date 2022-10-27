@@ -13,6 +13,26 @@ function plot_e_hist(data, gain::Float64 = 1.0)
     xlabel!("Energy [$(gain) keV]")
 end
 
+function plot_e_ind_hist(data, gain::Float64 = 1.0)
+    es0 = []
+    es1 = []
+    for e in data
+        if e.e_ind[1] > 0.0
+            push!(es0, e.e_ind[1])
+        end
+        if e.e_ind[2] > 0.0
+            push!(es1, e.e_ind[2])
+        end
+    end
+
+    plot(
+        histogram(es0, bins=0:(gain * 33):(gain * 2.2e3), title="Det0"),
+        histogram(es1, bins=0:(gain * 33):(gain * 2.2e3), title="Det1"),
+    )
+    ylabel!("Counts [ ]")
+    xlabel!("Energy [$(gain) keV]")
+end
+
 function plot_e_acc_hist(data, gain::Float64 = 1.0)
     es = []
     for e in data
@@ -54,7 +74,6 @@ function plot_diff_both_trig(data)
 end
 
 
-
 function plot2D_e_both_trig(data, gain::Float64 = 1.0)
     es = []
     dt = []
@@ -68,4 +87,34 @@ function plot2D_e_both_trig(data, gain::Float64 = 1.0)
     histogram2d(dt, es, nbins=40, title="DeltaTriggerTime vs DetSum", c=:imola)
     xlabel!("TrigTime0 - TrigTime1 [10 ns]")
     ylabel!("Energy [$(gain) keV]")
+end
+
+function plot2D_e_ind_both_trig(data, gain::Float64 = 1.0)
+    es0 = []
+    es1 = []
+    for e in data
+        if e.t_trig[1] > 0 && e.t_trig[2] > 0
+            push!(es0, e.e_ind[1])
+            push!(es1, e.e_ind[2])
+        end
+    end
+    
+    histogram2d(es0, es1, bins=(0:(gain * 50):(gain * 1.7e3), 0:(gain * 50):(gain * 1.7e3)), title="Det0 vs Det1 (Both Triggered)", c=:imola)
+    xlabel!("Energy0 [$(gain) keV]")
+    ylabel!("Energy1 [$(gain) keV]")
+end
+
+function plot2D_e_ind(data, gain::Float64 = 1.0)
+    es0 = []
+    es1 = []
+    for e in data
+        if e.e_ind[1] > 0 || e.e_ind[2] > 0
+            push!(es0, e.e_ind[1])
+            push!(es1, e.e_ind[2])
+        end
+    end
+    
+    histogram2d(es0, es1, bins=(0:(gain * 50):(gain * 1.7e3), 0:(gain * 50):(gain * 1.7e3)), title="Det0 vs Det1 (Both Triggered)", c=:imola)
+    xlabel!("Energy0 [$(gain) keV]")
+    ylabel!("Energy1 [$(gain) keV]")
 end
