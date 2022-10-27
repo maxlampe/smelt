@@ -120,9 +120,8 @@ function run_sim(
             end
 
             # detect energy on each detector
-            # FIXME: THis loop is broken with trigger!
-            for j = 1:n_det
-                if det_main.is_measuring == true
+            if det_main.is_measuring == true
+                for j = 1:n_det
                     if e_split[j] >= 0.1
                         # Set trigger time, if not set. Add tof for secondary detector
                         if curr_ev.t_trig[j] < 0
@@ -131,26 +130,24 @@ function run_sim(
                         curr_ev.n_sum += 1
                         curr_ev.e_ind[j] += e_split[j]
                     end
-                else
-                    trigger = check_trigger(e_split[j])
-                    if trigger
-                        # Todo: This adds trigger bias towards first detector. Should not be a problem as dt = 1e-8
-                        timing = [-1., -1.]
-                        timing[i] = t_now
-                        if t_tof_now > 0.0 && n_det > 1
-                            timing[(i % 2) + 1] = t_now + t_tof_now
-                        end
+                end
+            else
+                t0 = check_trigger(e_split[1])
+                t1 = check_trigger(e_split[2])
 
-                        # if only one detector, we loose backscattered fraction
-                        # if n_det == 1
-                        #     e_det = e_split[i]
-                        # else
-                        #     e_det = e_split[j]
-                        # end
-
-                        curr_ev = Event(timing, e_split, 0, 0)
-                        det_main.is_measuring = true
+                if t0 || t1
+                    det_main.is_measuring = true
+                    timing = [-1., -1.]
+                    # if both trigger in the same time step, this order gives a bias towards det = 1
+                    if t1
+                        timing[2] = t_now + abs(i - 2) * t_tof_now
+                        det_trig = 2
                     end
+                    if t0
+                        timing[1] = t_now + abs(i - 1) * t_tof_now
+                        det_trig = 1
+                    end
+                    curr_ev = Event(timing, e_split, i, 0)
                 end
             end
         end
