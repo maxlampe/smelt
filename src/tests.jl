@@ -51,7 +51,7 @@ include("tools.jl")
     @info "Dead time"
     @testset "Dead time" begin
         # Check if theo and dead time corrected sim rate are equal for high activity, no bs, tiny integration window
-        meas_time = 0.7
+        meas_time = 0.8
         src_rate = 5e4
         mono_src = [Source("mono", src_rate, 400., 0.)]
         for i = 1:2
