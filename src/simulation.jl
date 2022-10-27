@@ -19,6 +19,20 @@ function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Float64
 end
 
 
+# FIXME: Only works for gain =1.
+function check_trigger(en::Float64)
+    
+    if en > 60.0
+        return true
+    elseif en > 10.0
+        p_trig = trigger_func(en)
+        if p_trig >= rand()
+            return true
+        end
+    end
+    return false
+end
+
 function run_sim(
     srcs::Vector{Source};
     meas_time::Float64 = 1e0,
@@ -30,7 +44,7 @@ function run_sim(
 )::Tuple{Vector{Event}, Dict}
 
     if !isnothing(t_meas)
-    det_main = Detector(t_meas=t_meas)
+        det_main = Detector(t_meas=t_meas)
     else
         det_main = Detector()
     end
@@ -106,6 +120,7 @@ function run_sim(
             end
 
             # detect energy on each detector
+            # FIXME: THis loop is broken with trigger!
             for j = 1:n_det
                 if det_main.is_measuring == true
                     if e_split[j] >= 0.1
@@ -113,12 +128,13 @@ function run_sim(
                         if curr_ev.t_trig[j] < 0
                             curr_ev.t_trig[j] = t_now + abs(i - j) * t_tof_now
                         end
-                        curr_ev.e_det += e_now
+                        curr_ev.e_det += e_split[j]
                         curr_ev.n_sum += 1
                         curr_ev.e_ind[j] += e_split[j]
                     end
                 else
-                    if e_split[j] >= det_main.thresh
+                    trigger = check_trigger(e_split[j])
+                    if trigger
                         # Todo: This adds trigger bias towards first detector. Should not be a problem as dt = 1e-8
                         timing = [-1., -1.]
                         timing[i] = t_now
@@ -130,7 +146,7 @@ function run_sim(
                         if n_det == 1
                             e_det = e_split[i]
                         else
-                            e_det = e_now
+                            e_det = e_split[j]
                         end
 
                         curr_ev = Event(timing, e_det, e_split, 0, 0)

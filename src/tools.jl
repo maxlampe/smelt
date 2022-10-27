@@ -39,3 +39,14 @@ end
 function e_bs_frac(en::Float64)
     return exp_dec(en, -0.232, 0.001, 0.660) 
 end
+
+
+function trigger_func(en::Float64; a::Float64 = 0.093, p::Float64 = 0.78)
+
+    val = 1.0 - (1.0 - p)^(a * en) * (1.0 + (a * p * en) / (1.0 - p))
+    if val < 0.0
+        return 0.0
+    else
+        return val
+    end
+end
