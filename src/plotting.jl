@@ -114,7 +114,7 @@ function plot2D_e_ind(data, gain::Float64 = 1.0)
         end
     end
     
-    histogram2d(es0, es1, bins=(0:(gain * 50):(gain * 1.7e3), 0:(gain * 50):(gain * 1.7e3)), title="Det0 vs Det1 (Both Triggered)", c=:imola)
+    histogram2d(es0, es1, bins=(0:(gain * 50):(gain * 1.7e3), 0:(gain * 50):(gain * 1.7e3)), title="Det0 vs Det1", c=:imola)
     xlabel!("Energy0 [$(gain) keV]")
     ylabel!("Energy1 [$(gain) keV]")
 end
