@@ -14,14 +14,5 @@ srcs = [
 ]
 
 # res, stat = run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
-@btime run_sim($srcs; n_det=2, meas_time=0.1, with_bs=true)
-# @code_warntype run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
-
-"""
-6.612 s (179859982 allocations: 5.94 GiB)
-6.471 s (179860139 allocations: 5.94 GiB)
-6.485 s (179874781 allocations: 5.94 GiB)
-
-
-
-"""
+@btime run_sim($srcs; n_det=2, meas_time=0.1, with_bs=true, verbose=false, sim_step=1e-8)
+@code_warntype run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
