@@ -44,7 +44,7 @@ include("tools.jl")
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
             # half rate for one detector due to it only covering one hemisphere
             rate_exp = src_rate * meas_time * 0.5 * i
-            @test length(res) ≈ rate_exp atol=sqrt(4.0 * rate_exp)
+            @test length(res) ≈ rate_exp atol=2.0 * sqrt(rate_exp)
         end
     end
 
@@ -59,7 +59,7 @@ include("tools.jl")
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
             # half rate for one detector due to it only covering one hemisphere
             rate_exp = src_rate * meas_time * 0.5 * i
-            @test stat["ev_dt_corr"] ≈ rate_exp atol=sqrt(4.0 * rate_exp)
+            @test stat["ev_dt_corr"] ≈ rate_exp atol=2.0 * sqrt(rate_exp)
         end
     end
 
@@ -82,7 +82,7 @@ include("tools.jl")
             end
             rate_acc = (count_acc * stat["ev_dt_corr"] / stat["ev_count"]) / meas_time
             rate_exp = (src_rate * 0.5 * i)^2 * meas_wnd
-            @test rate_acc ≈ rate_exp atol=sqrt(4.0 * rate_exp)
+            @test rate_acc ≈ rate_exp atol=3.0 * sqrt(rate_exp)
         end
     end
 
@@ -111,7 +111,7 @@ include("tools.jl")
         # check probability of backscattering
         p_exp = length(es_bs) / length(es_mn)
         p_exp_err = sqrt( (sqrt(length(es_bs)) / length(es_mn))^2 + (sqrt(length(es_mn)) * length(es_bs) / length(es_mn)^2 )^2 )
-        @test p_exp ≈ prob_bs(src_energy) atol=(2.0* p_exp_err)
+        @test p_exp ≈ prob_bs(src_energy) atol=(2.0 * p_exp_err)
         # check fraction of energye being backscattered
         f_bs_exp = es_bs[1] / es_mn[1]
         @test f_bs_exp ≈ e_bs_frac(src_energy) atol=0.01
@@ -161,7 +161,7 @@ include("tools.jl")
     @testset "Trigger" begin
         # Check if single detector with bs gets two peaks if they match the empirical fraction in energy and height
 
-        meas_time = 0.1
+        meas_time = 0.2
         src_rate = 1e4
         src_energy = 20.
         mono_src = [Source("mono", src_rate, src_energy, 0.)]
