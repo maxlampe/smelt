@@ -18,6 +18,11 @@ function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Float64
     return energy
 end
 
+function create_ang()::Float64
+    # return rand() * 47.
+    return (1.0 - (1.0 / (1.0 - 0.9 * rand()))) * (47. / 9.) + 47.
+end
+
 
 # FIXME: Only works for gain =1.
 function check_trigger(en::Float64)
@@ -39,6 +44,7 @@ function run_sim(
     sim_step::Float64 = 5e-9,
     n_det::Int64 = 1,
     with_bs::Bool = false,
+    with_ang::Bool = false,
     t_meas::Union{Float64, Nothing} = nothing,
     verbose::Bool = false,
 )::Tuple{Vector{Event}, Dict}
@@ -108,14 +114,20 @@ function run_sim(
             
             # do backscattering process
             if e_now > 0.1 && with_bs
-                p = prob_bs(e_now)
+                if with_ang
+                    ang_now = create_ang()
+                else
+                    ang_now = 35.7
+                end
+
+                p = prob_bs(e_now, ang_now)
                 if p >= rand()
-                    frac_bs = e_bs_frac(e_now)
+                    frac_bs = e_bs_frac(e_now, ang_now)
                     e_split[i] = e_now * frac_bs
                     if n_det > 1
                         e_split[(i % 2) + 1] = e_now * (1.0 - frac_bs)
                     end
-                    t_tof_now = t_tof(e_now)
+                    t_tof_now = t_tof(e_now, ang_now)
                 end
             end
 
