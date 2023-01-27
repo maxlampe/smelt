@@ -14,5 +14,5 @@ srcs = [
 ]
 
 # res, stat = run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
-@btime run_sim($srcs; n_det=2, meas_time=0.1, with_bs=true, verbose=false, with_ang=true)
+@btime run_sim($srcs; n_det=2, meas_time=0.1, with_bs=true, verbose=false, with_ang=true, with_bs_var=true)
 @code_warntype run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)

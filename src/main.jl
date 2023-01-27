@@ -4,7 +4,7 @@ include("simulation.jl")
 include("plotting.jl")
 
 
-source_ind = 0
+source_ind = 2
 gain = 1. # [1/keV] or 30.89 [ch/keV]
 
 # Bi trigger rate ca. 4500 Hz; Bg trigger rate ca 500 Hz
@@ -47,7 +47,7 @@ elseif source_ind == 4
     ]
 end
 
-res, stat = run_sim(srcs; n_det=2, meas_time=60.0, with_bs=true, with_ang=true)
+res, stat = run_sim(srcs; n_det=2, meas_time=10.0, with_bs=true, with_ang=true, with_bs_var=true)
 print(stat)
 plot_e_hist(res, gain)
 # plot_e_ind_hist(res, gain)
@@ -56,10 +56,4 @@ plot_diff_both_trig(res)
 plot_e_both_trig(res, gain)
 plot2D_e_both_trig(res, gain)
 # plot2D_e_ind_both_trig(res, gain)
-plot2D_e_ind(res, gain)
-
-# res2, stat2 = run_sim(srcs; n_det=2, meas_time=5.0, with_bs=true, with_ang=false)
-# plot_e_hist(res2, gain)
-# plot_diff_both_trig(res2)
-# plot2D_e_ind(res2, gain)
-# plot2D_e_ind_both_trig(res2, gain)
+plot2D_e_ind(res, gain, 1600., 20.)

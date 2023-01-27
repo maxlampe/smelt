@@ -45,6 +45,7 @@ function run_sim(
     n_det::Int64 = 1,
     with_bs::Bool = false,
     with_ang::Bool = false,
+    with_bs_var::Bool = false,
     t_meas::Union{Float64, Nothing} = nothing,
     verbose::Bool = false,
 )::Tuple{Vector{Event}, Dict}
@@ -123,6 +124,11 @@ function run_sim(
                 p = prob_bs(e_now, ang_now)
                 if p >= rand()
                     frac_bs = e_bs_frac(e_now, ang_now)
+                    if with_bs_var
+                        norm = frac_bs * 2.6 + 1.6
+                        frac_bs = clamp(frac_bs + randn() * frac_bs / norm, 0., 1.)
+                    end
+
                     e_split[i] = e_now * frac_bs
                     if n_det > 1
                         e_split[(i % 2) + 1] = e_now * (1.0 - frac_bs)
