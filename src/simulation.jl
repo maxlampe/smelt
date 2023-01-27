@@ -133,7 +133,7 @@ function run_sim(
                     if n_det > 1
                         e_split[(i % 2) + 1] = e_now * (1.0 - frac_bs)
                     end
-                    t_tof_now = t_tof(e_now, ang_now)
+                    t_tof_now = t_tof(e_now * (1.0 - frac_bs), ang_now)
                 end
             end
 
