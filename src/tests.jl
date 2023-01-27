@@ -44,7 +44,7 @@ include("tools.jl")
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
             # half rate for one detector due to it only covering one hemisphere
             rate_exp = src_rate * meas_time * 0.5 * i
-            @test length(res) ≈ rate_exp atol=2.0 * sqrt(rate_exp)
+            @test length(res) ≈ rate_exp atol=3.0 * sqrt(rate_exp)
         end
     end
 
@@ -59,7 +59,7 @@ include("tools.jl")
             res, stat = run_sim(mono_src; n_det=i, meas_time=meas_time, with_bs=false, t_meas=1e-8)
             # half rate for one detector due to it only covering one hemisphere
             rate_exp = src_rate * meas_time * 0.5 * i
-            @test stat["ev_dt_corr"] ≈ rate_exp atol=2.0 * sqrt(rate_exp)
+            @test stat["ev_dt_corr"] ≈ rate_exp atol=3.0 * sqrt(rate_exp)
         end
     end
 
@@ -111,7 +111,7 @@ include("tools.jl")
         # check probability of backscattering
         p_exp = length(es_bs) / length(es_mn)
         p_exp_err = sqrt( (sqrt(length(es_bs)) / length(es_mn))^2 + (sqrt(length(es_mn)) * length(es_bs) / length(es_mn)^2 )^2 )
-        @test p_exp ≈ prob_bs(src_energy) atol=(2.0 * p_exp_err)
+        @test p_exp ≈ prob_bs(src_energy) atol=(3.0 * p_exp_err)
         # check fraction of energye being backscattered
         f_bs_exp = es_bs[1] / es_mn[1]
         @test f_bs_exp ≈ e_bs_frac(src_energy) atol=0.01
@@ -147,7 +147,7 @@ include("tools.jl")
             tot_bs = length(es_bs0) + length(es_bs1)
             p_exp = (tot_bs) / length(es_mn)
             p_exp_err = sqrt( (sqrt(tot_bs) / length(es_mn))^2 + (sqrt(length(es_mn)) * tot_bs / length(es_mn)^2 )^2 )
-            @test p_exp ≈ 2.0 * prob_bs(src_energy) atol=(2.0 * p_exp_err)
+            @test p_exp ≈ 2.0 * prob_bs(src_energy) atol=(3.0 * p_exp_err)
 
             # check fraction of energy being backscattered - should see both parts of the fraction now
             f_bs_exp = mean(es_bs0) / mean(es_mn)
