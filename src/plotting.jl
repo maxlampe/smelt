@@ -3,7 +3,7 @@ using Plots
 
 
 function plot_e_hist(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -21,7 +21,7 @@ function plot_e_hist(
 end
 
 function plot_e_ind_hist(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -48,7 +48,7 @@ function plot_e_ind_hist(
 end
 
 function plot_e_acc_hist(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -68,7 +68,7 @@ function plot_e_acc_hist(
 end
 
 function plot_e_both_trig(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -88,7 +88,7 @@ function plot_e_both_trig(
 end
 
 
-function plot_diff_both_trig(data, filename::String = "dtt")
+function plot_diff_both_trig(data; filename::String = "dtt")
     dt = []
     for e in data
         if e.t_trig[1] > 0 && e.t_trig[2] > 0 
@@ -104,7 +104,7 @@ end
 
 
 function plot2D_e_both_trig(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -122,8 +122,7 @@ function plot2D_e_both_trig(
     histogram2d(
         dt,
         es,
-        nbins=40,
-        bins=((-2.5e-7):(2e-8):(2.5e-7), 0:(gain * e_bin):(gain * e_max)),
+        bins=((-2.5e1 ):(2):(2.5e1), 0:(gain * e_bin):(gain * e_max)),
         title="DeltaTriggerTime vs DetSum",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
@@ -135,7 +134,7 @@ function plot2D_e_both_trig(
 end
 
 function plot2D_e_ind_both_trig(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
@@ -165,7 +164,7 @@ function plot2D_e_ind_both_trig(
 end
 
 function plot2D_e_ind(
-    data,
+    data;
     gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
     e_bin::Float64 = 20.,
