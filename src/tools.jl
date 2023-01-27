@@ -19,8 +19,8 @@ function r_gyr(en::Float64, b_0::Float64 = 0.084, b_1::Float64 = 0.165)
 end
 
 
-function t_tof(en::Float64, thet::Float64 = 35.7)
-    return 6.4 / (velo_rel(en) * cos(thet * pi / 180.))
+function t_tof(en::Float64, thet::Float64 = 35.7, dist::Float64 = 6.4)
+    return dist / (velo_rel(en) * cos(thet * pi / 180.))
 end
 
 
