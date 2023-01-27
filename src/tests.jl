@@ -184,12 +184,8 @@ end
 
 # ToDo: add check if bs electron too late for integration
 
-# ToDo: discuss tolerance size (2 sigma) for unit tests
-
 """
 missing checks
 1) add test to check with no bs, if both trig is a third of all acc with two detectors and half for one
 2) expect perfect deltatriggertime (camel) plot for mono energetic source with bs, check time diff with formula
-3) expect uniform deltatriggertime plot for mono energetic source without bs
-4) with only bs, i.e. short integration window, both triggered and acc should be equal for large E
 """
