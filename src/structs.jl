@@ -1,5 +1,7 @@
 
+
 using Parameters
+
 
 @with_kw mutable struct Detector
     t_meas::Float64 = 3e-7
@@ -23,4 +25,8 @@ struct Source
     rate::Float64
     energy::Float64
     width::Float64
+    p_cor::Float64
+    e_cor::Float64
+    w_cor::Float64
+    d_cor::Int64
 end

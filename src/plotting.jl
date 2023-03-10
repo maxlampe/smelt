@@ -1,12 +1,12 @@
 
+
 using Plots
 
 
 function plot_e_hist(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
     filename::String = "detsum",
 )
     es = []
@@ -14,17 +14,17 @@ function plot_e_hist(
         push!(es, e.e_ind[1] + e.e_ind[2])
     end
 
-    histogram(es, bins=0:(gain * e_bin):(gain * e_max), title="DetSum")
+    histogram(es, bins=0:e_bin:e_max, title="DetSum")
     ylabel!("Counts [ ]")
-    xlabel!("Energy [$(gain) keV]")
+    xlabel!("Energy [keV]")
     # savefig(filename)
 end
 
+
 function plot_e_ind_hist(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
     filename::String = "det_ind",
 )
     es0 = []
@@ -39,19 +39,39 @@ function plot_e_ind_hist(
     end
 
     plot(
-        histogram(es0, bins=0:(gain * e_bin):(gain * e_max), title="Det0"),
-        histogram(es1, bins=0:(gain * e_bin):(gain * e_max), title="Det1"),
+        histogram(es0, bins=0:e_bin:e_max, title="Det0"),
+        histogram(es1, bins=0:e_bin:e_max, title="Det1"),
     )
     ylabel!("Counts [ ]")
-    xlabel!("Energy [$(gain) keV]")
+    xlabel!("Energy [keV]")
     # savefig(filename)
 end
 
+
+function plot_e_hist_tofcut(
+    data;
+    e_max::Float64 = 1.8e3,
+    e_bin::Float64 = 3.36,
+    filename::String = "detsum_tofcut",
+)
+    es = []
+    for e in data
+        if e.t_trig[1] > 0 && e.t_trig[2] > 0 && abs(e.t_trig[1] - e.t_trig[2]) < 2e-8
+            push!(es, e.e_ind[1] + e.e_ind[2])
+        end
+    end
+
+    histogram(es, bins=0:e_bin:e_max, title="DetSum")
+    ylabel!("Counts [ ]")
+    xlabel!("Energy [keV]")
+    # savefig(filename)
+end
+
+
 function plot_e_acc_hist(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
     filename::String = "detsum_acc",
 )
     es = []
@@ -61,17 +81,17 @@ function plot_e_acc_hist(
         end
     end
     println("No accidentals: ", length(es))
-    histogram(es, bins=0:(gain * e_bin):(gain * e_max), title="DetSum - Only Pile-Ups")
+    histogram(es, bins=0:e_bin:_max, title="DetSum - Only Pile-Ups")
     ylabel!("Counts [ ]")
-    xlabel!("Energy [$(gain) keV]")
+    xlabel!("Energy [keV]")
     # savefig(filename)
 end
 
+
 function plot_e_both_trig(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
     filename::String = "detsum_bothtrig",
 )
     es = []
@@ -81,9 +101,9 @@ function plot_e_both_trig(
         end
     end
     
-    histogram(es, bins=0:(gain * e_bin):(gain * e_max), title="DetSum - Both Triggered")
+    histogram(es, bins=0:e_bin:e_max, title="DetSum - Both Triggered")
     ylabel!("Counts [ ]")
-    xlabel!("Energy [$(gain) keV]")
+    xlabel!("Energy [keV]")
     # savefig(filename)
 end
 
@@ -95,8 +115,8 @@ function plot_diff_both_trig(data; filename::String = "dtt")
             push!(dt, e.t_trig[1] - e.t_trig[2])
         end
     end
-    
-    histogram(dt, bins=(-2.5e-7):(2e-8):(2.5e-7), title="DeltaTriggerTime")
+
+    histogram(dt, bins=(-2.5e-7):(1.0e-8):(2.5e-7), title="DeltaTriggerTime")
     ylabel!("Counts [ ]")
     xlabel!("TrigTime0 - TrigTime1 [10 ns]")
     # savefig(filename)
@@ -105,9 +125,8 @@ end
 
 function plot2D_e_both_trig(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
     filename::String = "dtt_vs_detsum",
 )
     es = []
@@ -122,22 +141,23 @@ function plot2D_e_both_trig(
     histogram2d(
         dt,
         es,
-        bins=((-2.5e1 ):(2):(2.5e1), 0:(gain * e_bin):(gain * e_max)),
+        bins=((-2.5e1 ):(2):(2.5e1), 0:e_bin:e_max),
         title="DeltaTriggerTime vs DetSum",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
     xlabel!("TrigTime0 - TrigTime1 [10 ns]")
-    ylabel!("Energy [$(gain) keV]")
+    ylabel!("Energy [keV]")
     # savefig(filename)
 end
 
+
 function plot2D_e_ind_both_trig(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
+    e_min::Float64 = 0.,
     filename::String = "det0_vs_det1_bothtrig",
 )
     es0 = []
@@ -152,22 +172,25 @@ function plot2D_e_ind_both_trig(
     histogram2d(
         es0,
         es1,
-        bins=(0:(gain * e_bin):(gain * e_max), 0:(gain * e_bin):(gain * e_max)),
-        title="Energey: Det0 vs Det1 (Both Triggered)",
+        bins=(e_min:e_bin:e_max, e_min:e_bin:e_max),
+        title="Energy: Det0 vs Det1 (Both Triggered)",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
-    xlabel!("Energy0 [$(gain) keV]")
-    ylabel!("Energy1 [$(gain) keV]")
+    xlabel!("Energy0 [keV]")
+    ylabel!("Energy1 [keV]")
+    xlims!(0., e_max)
+    ylims!(0., e_max)
     # savefig(filename)
 end
 
+
 function plot2D_e_ind(
     data;
-    gain::Float64 = 1.0,
     e_max::Float64 = 1.8e3,
-    e_bin::Float64 = 20.,
+    e_bin::Float64 = 3.36,
+    e_min::Float64 = 0.,
     filename::String = "det0_vs_det1",
 )
     es0 = []
@@ -182,14 +205,16 @@ function plot2D_e_ind(
     histogram2d(
         es0,
         es1,
-        bins=(0:(gain * e_bin):(gain * e_max), 0:(gain * e_bin):(gain * e_max)),
+        bins=(e_min:e_bin:e_max, e_min:e_bin:e_max),
         title="Energy: Det0 vs Det1",
         # c=:imola,
         c=cgrad(:imola),
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
-    xlabel!("Energy0 [$(gain) keV]")
-    ylabel!("Energy1 [$(gain) keV]")
+    xlabel!("Energy0 [keV]")
+    ylabel!("Energy1 [keV]")
+    xlims!(0., e_max)
+    ylims!(0., e_max)
     # savefig(filename)
 end
