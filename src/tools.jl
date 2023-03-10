@@ -1,4 +1,7 @@
+
+
 using BasicInterpolators
+
 
 function dead_time_corr(counts::Int64; t_dead::Float64 = 1.5e-6, t_meas::Float64 = 1.0)
     return counts / (1.0 - (t_dead * counts) / t_meas)
@@ -19,8 +22,8 @@ function r_gyr(en::Float64, b_0::Float64 = 0.084, b_1::Float64 = 0.165)
 end
 
 
-function t_tof(en::Float64, thet::Float64 = 35.7)
-    return 6.4 / (velo_rel(en) * cos(thet * pi / 180.))
+function t_tof(en::Float64, thet::Float64 = 35.7, dist::Float64 = 6.4)
+    return dist / (velo_rel(en) * cos(thet * pi / 180.))
 end
 
 
@@ -39,6 +42,7 @@ function prob_bs(en::Float64, ang::Float64 = 35.7)
     p_mirror = interpol_p_bs_mirror(ang, en) 
     return p_raw * p_mirror
 end
+
 
 # function e_bs_frac(en::Float64)
 #     return exp_dec(en, -0.232, 0.001, 0.660) 

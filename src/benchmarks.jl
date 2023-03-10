@@ -1,18 +1,20 @@
+
+
 using BenchmarkTools
-# include("structs.jl")
 include("simulation.jl")
-# include("tools.jl")
+include("srcs.jl")
 
-bi_rate = 4.6e3
-gain = 1.
-srcs = [
-    Source("bi1", bi_rate * 0.7 / 7.0, gain * 450., gain * 35.),
-    Source("bi1_1", bi_rate * 0.25 / 7.0, gain * 520., gain * 35.),
-    Source("bi1_2", bi_rate * 0.1 / 7.0, gain * 570., gain * 30.),
-    Source("bi2", bi_rate * 4. / 7.0, gain * 1000., gain * 60.),
-    Source("bi0/bg", bi_rate * 1.95 / 7.0, gain * 70., gain * 19.),
-]
 
-# res, stat = run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
-@btime run_sim($srcs; n_det=2, meas_time=0.1, with_bs=true, verbose=false, with_ang=true, with_bs_var=true)
-@code_warntype run_sim(srcs; n_det=2, meas_time=0.1, with_bs=true)
+# Runtime checks 
+# 3.637s / 5.36 Gb
+@btime run_sim($srcs_ce; meas_time=0.1, sim_step=5e-9, with_bs=false, with_ang=false, with_bs_var=false, verbose=false)
+# 3.637s / 5.36 Gb
+@btime run_sim($srcs_ce; meas_time=0.1, sim_step=5e-9, with_bs=true, with_ang=true, with_bs_var=true, verbose=false)
+# 1.831s / 2.68 Gb
+@btime run_sim($srcs_ce; meas_time=0.1, sim_step=1e-8, with_bs=true, with_ang=true, with_bs_var=true, verbose=false)
+# 3.131s / 3.13 Gb (verbose makes it significantly slower!)
+@btime run_sim($srcs_ce; meas_time=0.1, sim_step=1e-8, with_bs=true, with_ang=true, with_bs_var=true, verbose=true)
+
+
+# Type checks
+@code_warntype run_sim(srcs_ce; meas_time=0.1, with_bs=true, with_ang=true, with_bs_var=true)
