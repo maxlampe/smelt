@@ -1,6 +1,7 @@
 
 
 using Plots
+include("birks.jl")
 
 
 function plot_e_hist(
@@ -216,5 +217,64 @@ function plot2D_e_ind(
     ylabel!("Energy1 [keV]")
     xlims!(0., e_max)
     ylims!(0., e_max)
+    # savefig(filename)
+end
+
+function plot2D_e_raw_e_det_rel(
+    data;
+    e_max::Float64 = 35.,
+    e_bin::Float64 = 0.104,
+    k_b::Float64 = 150., 
+    k_off::Float64 = 0.,
+    filename::String = "eraw_vs_detsum",
+)
+    es = []
+    rel_e = []
+    for e in data
+            push!(rel_e, (e.e_ind[1] + e.e_ind[2]) / e.e_raw)
+            push!(es, 0.001 * e.e_raw)
+    end
+
+    histogram2d(
+        es,
+        rel_e,
+        bins=(0:e_bin:e_max, 0.70:0.001:1.1),
+        title="Raw vs Corrected Energy (rel)",
+        c=:imola,
+        colorbar_title = "\nCounts [ ]",
+        right_margin = 5Plots.mm,
+    )
+    x_plot, y_plot = calc_birks(k_b, k_off)
+    plot!(x_plot * 30.9 * 0.001, y_plot)
+    ylims!(0.7, 1.1)
+    xlabel!("Raw Energy [kch]")
+    ylabel!("rel. Deviation [ ]")
+    # savefig(filename)
+end
+
+function plot2D_e_raw_e_det_abs(
+    data;
+    e_max::Float64 = 35.,
+    e_bin::Float64 = 0.104,
+    filename::String = "eraw_vs_detsum",
+)
+    es = []
+    rel_e = []
+    for e in data
+            push!(rel_e, 0.001 * ((e.e_ind[1] + e.e_ind[2]) - e.e_raw))
+            push!(es, 0.001 * e.e_raw)
+    end
+
+    histogram2d(
+        es,
+        rel_e,
+        bins=(0:e_bin:e_max, -1.2:0.01:1.2),
+        title="Raw vs Corrected Energy (abs)",
+        c=:imola,
+        colorbar_title = "\nCounts [ ]",
+        right_margin = 5Plots.mm,
+    )
+    xlabel!("Raw Energy [kch]")
+    ylabel!("abs. Deviation [kch]")
     # savefig(filename)
 end
