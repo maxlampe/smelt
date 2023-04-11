@@ -226,6 +226,8 @@ function plot2D_e_raw_e_det_rel(
     e_bin::Float64 = 0.104,
     k_b::Float64 = 150., 
     k_off::Float64 = 0.,
+    k_mul::Float64 = 1.,
+    gain::Float64 = 30.9,
     filename::String = "eraw_vs_detsum",
 )
     es = []
@@ -244,8 +246,8 @@ function plot2D_e_raw_e_det_rel(
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
-    x_plot, y_plot = calc_birks(k_b, k_off)
-    plot!(x_plot * 30.9 * 0.001, y_plot)
+    # x_plot, y_plot = calc_birks(k_b, k_off)
+    # plot!(x_plot * gain * 0.001, ((y_plot./x_plot).* k_mul).+ k_off)
     ylims!(0.7, 1.1)
     xlabel!("Raw Energy [kch]")
     ylabel!("rel. Deviation [ ]")
@@ -256,6 +258,10 @@ function plot2D_e_raw_e_det_abs(
     data;
     e_max::Float64 = 35.,
     e_bin::Float64 = 0.104,
+    k_b::Float64 = 150., 
+    k_off::Float64 = 0.,
+    k_mul::Float64 = 1.,
+    gain::Float64 = 30.9,
     filename::String = "eraw_vs_detsum",
 )
     es = []
@@ -274,6 +280,8 @@ function plot2D_e_raw_e_det_abs(
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
+    # x_plot, y_plot = calc_birks(k_b, k_off)
+    # plot!(x_plot * gain * 0.001, (((x_plot.-y_plot) * gain * 0.001).* k_mul).+ k_off)
     xlabel!("Raw Energy [kch]")
     ylabel!("abs. Deviation [kch]")
     # savefig(filename)

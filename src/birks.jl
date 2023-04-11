@@ -84,11 +84,12 @@ function cacheIntegral6(k_B::Float64)
     return estar_i, estar_k, estar_y
  end
 
-function calc_birks(kB::Float64 = 150., off::Float64 = 0., with_plot::Bool = false)
+
+function calc_birks(kB::Float64 = 150., with_plot::Bool = false)
 
     estar_i, estar_k, estar_y = cacheIntegral6(kB)
     x = range(1, 1100, length=100)
-    y = [(getBirks(x_i, estar_i, estar_k, estar_y)/x_i) + off for x_i in x]
+    y = [(getBirks(x_i, estar_i, estar_k, estar_y)) for x_i in x]
 
     if with_plot
         plot(x, y)
@@ -96,4 +97,28 @@ function calc_birks(kB::Float64 = 150., off::Float64 = 0., with_plot::Bool = fal
     end
 
     return x, y
+end 
+
+
+function f_birks(x_en::Vector{Float64}, par::Vector{Float64})
+    k_B = par[1]
+    k_fac = par[2]
+    estar_i, estar_k, estar_y = cacheIntegral6(k_B)
+
+    y = [getBirks(xx, estar_i, estar_k, estar_y) for xx in x_en]
+    y = ((y.* k_fac)./ x_en)
+
+    return y
+end 
+
+
+function f_birks_150(x_en::Vector{Float64}, par::Vector{Float64})
+    k_B = par[1]
+    k_fac = par[2]
+    estar_i, estar_k, estar_y = cacheIntegral6(k_B)
+
+    y = [getBirks(xx, estar_i, estar_k, estar_y) for xx in x_en]
+    y = ((y.* k_fac)./ x_en)
+
+    return y.* f_birks(x_en, [150., 1.])
 end 
