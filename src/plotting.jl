@@ -262,7 +262,7 @@ function plot2D_e_raw_e_det_abs(
     k_off::Float64 = 0.,
     k_mul::Float64 = 1.,
     gain::Float64 = 30.9,
-    filename::String = "eraw_vs_detsum",
+    filename::String = "qdc_abs_nonlin",
 )
     es = []
     rel_e = []

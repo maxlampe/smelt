@@ -37,10 +37,14 @@ end
 #     p_mirror = exp_dec(en, 0.032, 0.00084, 0.471) 
 #     return p_raw * p_mirror
 # end
-function prob_bs(en::Float64, ang::Float64 = 35.7)
+function prob_bs(en::Float64, ang::Float64 = 35.7, mult::Bool=true)
     p_raw = interpol_p_bs_raw(ang, en)
     p_mirror = interpol_p_bs_mirror(ang, en) 
-    return p_raw * p_mirror
+    if mult
+        return p_raw * p_mirror
+    else
+        return p_raw, p_mirror
+    end
 end
 
 
