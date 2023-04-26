@@ -57,7 +57,7 @@ function plot_e_hist_tofcut(
 )
     es = []
     for e in data
-        if e.t_trig[1] > 0 && e.t_trig[2] > 0 && abs(e.t_trig[1] - e.t_trig[2]) < 2e-8
+        if e.t_trig[1] > 0 && e.t_trig[2] > 0 && abs(e.t_trig[1] - e.t_trig[2]) < 1e-8
             push!(es, e.e_ind[1] + e.e_ind[2])
         end
     end
@@ -217,6 +217,42 @@ function plot2D_e_ind(
     ylabel!("Energy1 [keV]")
     xlims!(0., e_max)
     ylims!(0., e_max)
+    # savefig(filename)
+end
+
+function plot_time2last_event(
+    data;
+    double_trigger::Bool = false,
+    filename::String = "detsum_tofcut",
+)
+    ts = []
+    d1 = data[2:lastindex(data)]
+    d0 = data[1:lastindex(data) - 1]
+
+    for ind_e = 1:lastindex(d1)
+        is_valid = true
+        t_curr = []
+        for arr in [d0, d1]
+            t_arr1 = arr[ind_e].t_trig[1]
+            t_arr2 = arr[ind_e].t_trig[2]
+            if t_arr1 < 0 || t_arr2 < 0
+                t_arr = max(t_arr1, t_arr2)
+                if double_trigger
+                    is_valid = false
+                end
+            else
+                t_arr = min(t_arr1, t_arr2)
+            end
+            push!(t_curr, t_arr)
+        end
+        if is_valid
+            push!(ts, t_curr[2] - t_curr[1])
+        end
+    end
+    
+    histogram(ts, bins=0.:(5.0e-5):(4e-3), title="DPTT")
+    ylabel!("Counts [ ]")
+    xlabel!("Time [10 ns]")
     # savefig(filename)
 end
 

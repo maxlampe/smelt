@@ -78,4 +78,5 @@ struct Source
     e_cor::Float64
     w_cor::Float64
     d_cor::Int64
+    t_cor_dec::Float64
 end

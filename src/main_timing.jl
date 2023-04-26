@@ -5,6 +5,16 @@ include("plotting.jl")
 include("srcs.jl")
 
 
+# obs data trigger rate 2500 / obs bg rate 530 [Hz]
+# target obs rate 1970 [Hz]
+sn_rate = 2.e3
+srcs_sn = [
+    Source("sn1", sn_rate * 0.9, 340., 35., 0., 0., 0., 0),
+    Source("sn0", sn_rate * 0.1, 22., 10., 0., 0., 0., 0),
+    Source("snx1", sn_rate * 0.04, 65., 100., 0., 0., 0., 0),
+    Source("snx2", sn_rate * 0.03, 145., 100., 0., 0., 0., 0),
+]
+
 res, stat = run_sim(srcs_sn; meas_time=1., sim_step=1e-8, with_bs=true, with_ang=true, with_bs_var=true, verbose=true)
 print(stat)
 plot_e_hist(res; e_max=800.)
@@ -15,7 +25,13 @@ plot_e_hist_tofcut(res; e_max=800.)
 
 # -----------------------------------------------------------------
 
-res, stat = run_sim(srcs_cd; meas_time=5., sim_step=1e-8, with_bs=true, with_ang=true, with_bs_var=true, verbose=true)
+cd_rate = 4.93e3
+srcs_cd = [
+    Source("cd1", cd_rate * 0.5, 55., 17., 0.29, 14., 4., 0, 1e-9),
+    Source("cd1", cd_rate * 0.5, 55., 17., 0.29, 14., 4., 0, 4e-8),
+]
+
+res, stat = run_sim(srcs_cd; meas_time=15., sim_step=4e-8, with_bs=true, with_ang=true, with_bs_var=true, verbose=false)
 print(stat)
 plot_e_hist(res; e_max=200.)
 plot_diff_both_trig(res)
