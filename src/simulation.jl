@@ -256,7 +256,7 @@ function run_sim(
                             end
 
                             
-                            curr_ev = Event(timing, events[perm], det_trig, 0)
+                            curr_ev = Event(timing, events[perm], -1., det_trig, 0)
                             # get index of untriggered detector (-1 if both have triggered)
                             d_untrig = (t1 * t2) ? -1. : (t2 * 1 + t1 * 2)
                         end

@@ -15,10 +15,14 @@ function plot_e_hist(
         push!(es, e.e_ind[1] + e.e_ind[2])
     end
 
-    histogram(es, bins=0:e_bin:e_max, title="DetSum")
+    histogram(
+        es,
+        bins=0:e_bin:e_max,
+        # title="DetSum",
+    )
     ylabel!("Counts [ ]")
     xlabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -45,7 +49,7 @@ function plot_e_ind_hist(
     )
     ylabel!("Counts [ ]")
     xlabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -62,10 +66,14 @@ function plot_e_hist_tofcut(
         end
     end
 
-    histogram(es, bins=0:e_bin:e_max, title="DetSum")
+    histogram(
+        es,
+        bins=0:e_bin:e_max,
+        # title="DetSum",
+    )
     ylabel!("Counts [ ]")
     xlabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -82,10 +90,14 @@ function plot_e_acc_hist(
         end
     end
     println("No accidentals: ", length(es))
-    histogram(es, bins=0:e_bin:_max, title="DetSum - Only Pile-Ups")
+    histogram(
+        es,
+        bins=0:e_bin:_max,
+        # title="DetSum - Only Pile-Ups",
+    )
     ylabel!("Counts [ ]")
     xlabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -102,10 +114,14 @@ function plot_e_both_trig(
         end
     end
     
-    histogram(es, bins=0:e_bin:e_max, title="DetSum - Both Triggered")
+    histogram(
+        es,
+        bins=0:e_bin:e_max,
+        # title="DetSum - Both Triggered",
+    )
     ylabel!("Counts [ ]")
     xlabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -117,10 +133,14 @@ function plot_diff_both_trig(data; filename::String = "dtt")
         end
     end
 
-    histogram(dt, bins=(-2.5e-7):(1.0e-8):(2.5e-7), title="DeltaTriggerTime")
+    histogram(
+        dt,
+        bins=(-2.5e-7):(1.0e-8):(2.5e-7),
+        # title="DeltaTriggerTime",
+        )
     ylabel!("Counts [ ]")
-    xlabel!("TrigTime0 - TrigTime1 [10 ns]")
-    # savefig(filename)
+    xlabel!("Electron Time-of-Flight [10 ns]")
+    savefig(filename)
 end
 
 
@@ -143,14 +163,14 @@ function plot2D_e_both_trig(
         dt,
         es,
         bins=((-2.5e1 ):(2):(2.5e1), 0:e_bin:e_max),
-        title="DeltaTriggerTime vs DetSum",
+        # title="DeltaTriggerTime vs DetSum",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
     )
-    xlabel!("TrigTime0 - TrigTime1 [10 ns]")
+    xlabel!("Electron Time-of-Flight [10 ns]")
     ylabel!("Energy [keV]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -174,7 +194,7 @@ function plot2D_e_ind_both_trig(
         es0,
         es1,
         bins=(e_min:e_bin:e_max, e_min:e_bin:e_max),
-        title="Energy: Det0 vs Det1 (Both Triggered)",
+        # title="Energy: Det0 vs Det1 (Both Triggered)",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
@@ -183,7 +203,7 @@ function plot2D_e_ind_both_trig(
     ylabel!("Energy1 [keV]")
     xlims!(0., e_max)
     ylims!(0., e_max)
-    # savefig(filename)
+    savefig(filename)
 end
 
 
@@ -207,7 +227,7 @@ function plot2D_e_ind(
         es0,
         es1,
         bins=(e_min:e_bin:e_max, e_min:e_bin:e_max),
-        title="Energy: Det0 vs Det1",
+        # title="Energy: Det0 vs Det1",
         # c=:imola,
         c=cgrad(:imola),
         colorbar_title = "\nCounts [ ]",
@@ -217,7 +237,7 @@ function plot2D_e_ind(
     ylabel!("Energy1 [keV]")
     xlims!(0., e_max)
     ylims!(0., e_max)
-    # savefig(filename)
+    savefig(filename)
 end
 
 function plot_time2last_event(
@@ -253,7 +273,7 @@ function plot_time2last_event(
     histogram(ts, bins=0.:(5.0e-5):(4e-3), title="DPTT")
     ylabel!("Counts [ ]")
     xlabel!("Time [10 ns]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 function plot2D_e_raw_e_det_rel(
@@ -277,7 +297,7 @@ function plot2D_e_raw_e_det_rel(
         es,
         rel_e,
         bins=(0:e_bin:e_max, 0.70:0.001:1.1),
-        title="Raw vs Corrected Energy (rel)",
+        # title="Raw vs Corrected Energy (rel)",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
@@ -287,7 +307,7 @@ function plot2D_e_raw_e_det_rel(
     ylims!(0.7, 1.1)
     xlabel!("Raw Energy [kch]")
     ylabel!("rel. Deviation [ ]")
-    # savefig(filename)
+    savefig(filename)
 end
 
 function plot2D_e_raw_e_det_abs(
@@ -311,7 +331,7 @@ function plot2D_e_raw_e_det_abs(
         es,
         rel_e,
         bins=(0:e_bin:e_max, -1.2:0.01:1.2),
-        title="Raw vs Corrected Energy (abs)",
+        # title="Raw vs Corrected Energy (abs)",
         c=:imola,
         colorbar_title = "\nCounts [ ]",
         right_margin = 5Plots.mm,
@@ -320,5 +340,5 @@ function plot2D_e_raw_e_det_abs(
     # plot!(x_plot * gain * 0.001, (((x_plot.-y_plot) * gain * 0.001).* k_mul).+ k_off)
     xlabel!("Raw Energy [kch]")
     ylabel!("abs. Deviation [kch]")
-    # savefig(filename)
+    savefig(filename)
 end
