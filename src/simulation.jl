@@ -7,15 +7,19 @@ include("tools.jl")
 
 
 # Only works for dtime * SIM_STEP << 1
-function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Vector{Vector{Float64}}
+function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Tuple{Vector{Vector{Float64}}, Vector{Vector{Float64}}}
     energy = []
+    offsets = []
     for src in srcs
         # rate effectively halved for one detector, as one only covers one hemisphere
         if (src[1] * dtime) >= rand()
             det = Int64(round(rand()) + 1)
             ev = [0., 0.]
             ev[det] = clamp(randn() * src[3] + src[2], 0., Inf)
+
+            t_off = [0., 0.]
             append!(energy, [ev])
+            append!(offsets, [t_off])
             
             # create correlated event
             if src[4] > 0.
@@ -33,12 +37,20 @@ function create_energy(srcs::Vector{Vector{Float64}}, dtime::Float64)::Vector{Ve
                         det_c = Int64(round(rand()) + 1)
                     end
                     ev[det_c] = clamp(randn() * src[6] + src[5], 0., Inf)
+
+                    if src[8] > 0.
+                        # ToDo: Sampel actual delay time
+                        t_off[det_c] = -1. * src[8] * log(1. - rand())
+                    else
+                        t_off[det_c] = 0.
+                    end
                     append!(energy, [ev])
+                    append!(offsets, [t_off])
                 end
             end
         end
     end
-    return energy
+    return energy, offsets
 end
 
 
@@ -62,7 +74,7 @@ function check_trigger(en::Float64)
     return false
 end
 
-
+# Note: sim_step can be larger than resolution (1e-8), if no accidentals. However, sim_step < t_meas!
 function run_sim(
     srcs::Vector{Source};
     meas_time::Float64 = 1e0,
@@ -89,7 +101,7 @@ function run_sim(
     #convert to vector for faster evaluation
     src_vec = Vector{Vector{Float64}}(undef, length(srcs))
     for (i, src) in enumerate(srcs)
-        src_vec[i] = [src.rate, src.energy, src.width, src.p_cor, src.e_cor, src.w_cor, src.d_cor]
+        src_vec[i] = [src.rate, src.energy, src.width, src.p_cor, src.e_cor, src.w_cor, src.d_cor, src.t_cor_dec]
     end
 
     n_time_steps = meas_time/sim_step
@@ -130,7 +142,7 @@ function run_sim(
         end
 
         # Create events in this time step for both detectors [n_ev x 2]
-        events = create_energy(src_vec, sim_step)
+        events, t_offs = create_energy(src_vec, sim_step)
         n_ev = lastindex(events)
         if n_ev > 0
             
@@ -143,7 +155,7 @@ function run_sim(
 
             # calc tof (to detector ~3.2m) for timing [n_ev x 2]
             dist = [3.7, 2.7]
-            tofs_ini = [[t_tof(events[j][i], ang_now[j][i], dist[i]) for i=1:2] for j=1:n_ev ]
+            tofs_ini = [[t_tof(events[j][i], ang_now[j][i], dist[i]) + t_offs[j][i] for i=1:2] for j=1:n_ev ]
 
             # do bs: split energies (or create new events?), calculate new tofs (from detector to detector) (BS FLAG, VAR FLAG)
             if with_bs
@@ -244,7 +256,7 @@ function run_sim(
                             end
 
                             
-                            curr_ev = Event(timing, events[perm], det_trig, 0)
+                            curr_ev = Event(timing, events[perm], -1., det_trig, 0)
                             # get index of untriggered detector (-1 if both have triggered)
                             d_untrig = (t1 * t2) ? -1. : (t2 * 1 + t1 * 2)
                         end

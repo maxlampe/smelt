@@ -173,7 +173,9 @@ function gen_qdc_data(x_in; n_smp::Int64 = 2000)
         for ev in curr_res
                 push!(ev_ens, (ev.e_ind[1] + ev.e_ind[2]) / ev.e_raw)
         end
-
+        
+        # histogram(ev_ens)
+        # savefig("hist.png")
         mu = mean(ev_ens)
         sig = std(ev_ens)
         push!(mus, mu)
@@ -193,7 +195,10 @@ function gen_birks_comp(
     xs = [
         # Cd, Ce, Sn, Bi mid, Cs, Bi high
         # 60., 105., 
-        344., 460., 640., 990.,
+        # 344., 460., 640., 990.,
+        # 75., 
+        # 127., 
+        369., 503., 630., 995.,
     ]
     # xs = [
     #     # n_bins = [10., 16., 36., 41., 52., 68.]; norm = 11.
@@ -230,7 +235,7 @@ function gen_birks_comp(
         kb_plot_err =  round(stderror(fit)[1], digits=1)
         plot!(x_plot, y_plot, label="Fit (kB = $(kb_plot) +- $(kb_plot_err))")
         mus_full, sigs_full = gen_qdc_data(x_plot)
-        plot!(x_plot, mus_full, grid=true, label="Sim Full")
+        plot!(x_plot, mus_full, grid=true, label="Sim Full", legend=:bottomright)
         # ylims!(0.7, 1.1)
         ylims!(0.4, 1.1)
         ylabel!("rel. Deviation [ ]")
@@ -240,7 +245,7 @@ function gen_birks_comp(
         xlabel!("Raw Energy [keV]")
 
         # return plot(p1, p2 ,layout=Plots.grid(2,1, heights=[0.75, 0.25]), bottom_margin=[-5mm 0mm])
-        # savefig("qdc_nonlin_comp")
+        # savefig("qdc_nonlin_comp_$(length(xs))_noPB.pdf")
 
         # Fit simulation nonlinearity empiricaly
 

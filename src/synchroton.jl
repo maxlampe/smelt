@@ -20,11 +20,19 @@ function synch_loss(en::Float64)
     return e_loss_turn(en) * n_turns(en)
 end
 
+println(mean([synch_loss(1000.) for i=1:1000]))
+println(std([synch_loss(1000.) for i=1:1000]))
 
 # mean E loss due to synchroton radiation for 1 MeV electron in Perkeo
 es = LinRange(1., 1500., 30)
 losses = [mean([synch_loss(e) for i=1:1000]) * 1.1 for e in es]
+losses_sigs = [std([synch_loss(e) for i=1:1000]) * 1.1 for e in es]
 
-plot(es, losses, title="Synchroton Loss In PERKEO", label="Loss")
+plot(es, losses, title="Synchroton Loss (PERKEO III)", label="Loss")
+ylabel!("Energy Loss [eV]")
+xlabel!("Energy [keV]")
+# savefig("synch_loss")
+
+plot(es, losses_sigs, title="Synchroton Loss (PERKEO III)", label="Loss")
 ylabel!("Energy Loss [eV]")
 xlabel!("Energy [keV]")
