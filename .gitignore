@@ -25,3 +25,4 @@ Manifest.toml
 
 dump.jl
 *.png
+*.DS_Store
