@@ -229,18 +229,48 @@ function gen_birks_comp(
         kb_plot = round(coef(fit)[1], digits=1)
         kb_plot_err =  round(stderror(fit)[1], digits=1)
         plot!(x_plot, y_plot, label="Fit (kB = $(kb_plot) +- $(kb_plot_err))")
-        mus, sigs = gen_qdc_data(x_plot)
-        plot!(x_plot, mus, grid=true, label="Sim Full")
+        mus_full, sigs_full = gen_qdc_data(x_plot)
+        plot!(x_plot, mus_full, grid=true, label="Sim Full")
         # ylims!(0.7, 1.1)
         ylims!(0.4, 1.1)
         ylabel!("rel. Deviation [ ]")
 
-        p2 = plot(x_plot, y_plot .- mus, label="Birks - Sim", xticks=0:200:1100, yticks=-0.01:0.005:0.01)
+        p2 = plot(x_plot, y_plot .- mus_full, label="Birks - Sim", xticks=0:200:1100, yticks=-0.01:0.005:0.01)
         ylims!(-0.0095, 0.0095)
         xlabel!("Raw Energy [keV]")
 
-        plot(p1, p2 ,layout=Plots.grid(2,1, heights=[0.75, 0.25]), bottom_margin=[-5mm 0mm])
-        savefig("qdc_nonlin_comp")
+        # return plot(p1, p2 ,layout=Plots.grid(2,1, heights=[0.75, 0.25]), bottom_margin=[-5mm 0mm])
+        # savefig("qdc_nonlin_comp")
+
+        # Fit simulation nonlinearity empiricaly
+
+        wt_full = 1 ./ sigs_full .^2
+        # fit_exp = curve_fit(f_emp, x_plot, mus_full, wt_full, [1.1, 1., -0.005])
+        # fit_exp = curve_fit(f_emp, x_plot, mus_full, wt_full, [1.1, 1., -0.005, 1., -0.01])
+        fit_exp = curve_fit(f_emp, x_plot, mus_full, [1.1, 1., -0.005, 1., -0.01, 0.5, -0.05])
+        # fit_exp = curve_fit(f_emp, x_plot, mus_full, [1.1, 1., -0.005, 0.5, -0.001])
+        # fit_exp = curve_fit(f_emp, x_plot, mus_full, [1.04, 40.])
+
+        
+        y_plot_exp = f_emp(x_plot, coef(fit_exp))
+        println(coef(fit_exp))
+        # println(stderror(fit_exp))
+        p4 = plot(x_plot, mus_full, grid=true, label="Smelt Sim. Continuous", lw=2)
+        plot!(x_plot, y_plot_exp, label="Fit (empirical)", lw=2)
+        plot!(x_plot, f_birks(x_plot, [470., 1.15]), label="Birks", lw=2)
+        
+        plot!(x_plot, 1.05 .- 35. ./ x_plot)
+        ylims!(0.0, 1.1)
+        xlabel!("Energy [keV]")
+        ylabel!("relative Deviation [a.u.]")
+
+        rchi2 = sum(((y_plot_exp - mus_full) ./ sigs_full).^2)
+        println(rchi2, lastindex(mus_full))
+        println(rchi2 / (lastindex(mus_full) - 7))
+
+        # savefig("qdc_smeltsim_qdcempirical.pdf")
+
+        return p4
 
     else
         plot(xs, mus, grid=false, yerror=sigs)
@@ -256,13 +286,6 @@ end
 gen_birks_comp(470., 0., 1.159)
 
 
-x_plot = vcat(range(10, 1100, length=100))
-y_plot = f_birks(x_plot, [490., 1.])
-y_plot2 = f_birks(x_plot, [490., 1.]).* f_birks(x_plot, [150., 1.]) * 1.05
-plot(x_plot, y_plot)
-plot!(x_plot, y_plot2)
-
-
 function plot_energy_resolution()
     xplot = vcat(range(50, 1100, length=50))
     plot(xplot, (xplot ./ 0.6 * 2.4) .^ 0.5 .* 2.355, label="Model")
@@ -275,3 +298,58 @@ function plot_energy_resolution()
     # savefig("fwhm_model")
 end
 plot_energy_resolution()
+
+function f_expo(x_en::Vector{Float64}, par::Vector{Float64})
+    a_0 = par[1]
+    a_1 = par[2]
+    # a_2 = par[3]
+
+    y = [(x - (a_0 * x + a_1)) / (x) for x in x_en]
+
+    return y
+end 
+
+function f_emp(x_en::Vector{Float64}, par::Vector{Float64})
+    # a_0 = par[1]
+    # a_1 = par[2]
+    # a_2 = par[3]
+    # y = a_0 .-  exp.(x_en .* a_2) .* a_1
+
+    a_0 = par[1]
+    a_1 = par[2]
+    a_2 = par[3]
+    a_3 = par[4]
+    a_4 = par[5]
+    a_5 = par[6]
+    a_6 = par[7]
+    y = a_0 .-  exp.(x_en .* a_2) .* a_1 .-  exp.(x_en .* a_4) .* a_3 .-  exp.(x_en .* a_6) .* a_5
+    # [1.02130, 0.32546, -0.00438, 1.99055, -0.02619, 73.5903, -0.14360]
+    # rChi2 0.17906381977672683
+
+    # a_0 = par[1]
+    # a_1 = par[2]
+    # a_2 = par[3]
+    # a_3 = par[4]
+    # a_4 = par[5]
+
+    # y = a_0 .-  exp.(x_en .* a_2) .* a_1 .-  exp.(x_en .* a_4) .* a_3 
+    # rChi2 32.
+
+    # a_0 = par[1]
+    # a_1 = par[2]
+    # y = a_0 .- a_1 ./ x_en
+    # #  a_i = [1.05, -35.]
+
+    return y
+end 
+
+x_plot = vcat(range(10, 1100, length=100))
+plot(x_plot, f_emp(x_plot, [1.02130, 0.32546, -0.00438, 1.99055, -0.02619, 73.5903, -0.14360]), ylims=[0.3, 1.1])
+plot!(x_plot, 1.05 .- 35. ./ x_plot)
+
+
+
+y_plot = [(1.1 - exp(-0.005 * x)) for x in x_plot]
+
+y_plot = [(x - (1.54 * x - 32.5)) / (x) for x in x_plot]
+plot(x_plot, y_plot)
